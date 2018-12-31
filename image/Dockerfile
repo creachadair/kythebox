@@ -48,6 +48,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
 
 FROM build AS kythe
 ARG HOMEDIR=/home/kythedev
+ARG LLVMDIR=/home/kythedev/kythe/third_party/llvm
 #
 # The container is expected to map volume kythe-dev-repo to $HOMEDIR so that
 # results are persisted.
@@ -60,5 +61,5 @@ RUN groupadd -g 501 kythedev && \
     # allow the user to sudo to install things
 USER    kythedev:kythedev
 ENV     CLANG=/usr/bin/clang-4.0 PATH="$HOMEDIR/go/bin:${PATH}"
-VOLUME  $HOMEDIR
+VOLUME  $HOMEDIR $LLVMDIR
 WORKDIR "$HOMEDIR"/kythe

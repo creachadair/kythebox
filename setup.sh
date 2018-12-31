@@ -21,15 +21,20 @@ set -e -o pipefail
 
 # -- begin configuration --
 
-# The name of the volume to create to hold the Kythe repository.
+# The name of the volumes to create to hold the Kythe repository.
+# We keep a separate volume for the LLVM installation to cut down on the need
+# to rebuild it quite so often.
 readonly volume=kythe-dev-homedir
+readonly llvolume=kythe-dev-llvm
 
 # The URL of the Kythe repository, for "git clone".
 readonly repo='https://github.com/kythe/kythe.git'
 
-# The path of the home directory on the container image where the volume should
-# be mounted.
+# The path where the home volume should be mounted.
 readonly mountpoint=/home/kythedev
+
+# The path where the LLVM volume should be mounted.
+readonly llmount="$mountpoint"/kythe/third_party/llvm
 
 # The tag to apply to the build image.
 readonly tag=kythedev
@@ -52,8 +57,10 @@ then
 
     echo " >> Installing repo into volume $volume ..." 1>&2
     docker volume create "$volume"
+    docker volume create "$llvolume"
     docker run -d --name=$kvi -it \
 	   --mount source="$volume",target="$mountpoint" \
+	   --mount source="$llvolume",target="$llmount" \
 	   busybox sh
     docker cp "$tmp/kythe" "$kvi":"$mountpoint"
     docker exec $kvi mkdir -p "$mountpoint"/go/{src,pkg,bin}
@@ -69,12 +76,16 @@ echo "
 -- Building and tagging image: $tag ..." 1>&2
 readonly dir="$(dirname "$0")"
 (cd "$dir" ; \
- docker build -t "$tag" --build-arg HOMEDIR="$mountpoint" image)
+ docker build -t "$tag" \
+	--build-arg HOMEDIR="$mountpoint" \
+	--build-arg LLVMDIR="$llmount" \
+	image)
 
 # Do the expensive initial build of LLVM.
 if [[ "$(docker ps --filter=name="$container" -a -q)" = '' ]] ; then
     docker run -d --name="$container" -it \
 	   --mount source="$volume",target="$mountpoint" \
+	   --mount source="$llvolume",target="$llmount" \
 	   "$tag":latest /bin/bash
 else
     docker restart "$container"
