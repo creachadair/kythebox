@@ -20,7 +20,7 @@ FROM base AS bazel
 # Install bazel from the bazel.build APT repository.
 #
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y \
+    apt-get install --no-install-recommends -qy \
        curl gnupg2 openjdk-8-jdk software-properties-common && \
     curl https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
     add-apt-repository \
@@ -32,14 +32,16 @@ FROM bazel AS build
 # Install the external dependencies of Kythe.
 # See: https://kythe.io/getting-started/
 #
-# Additions: cmake, golang, jq, make, patch, sudo, zip
+# Additions: arcanist, cmake, golang, golint, jq, make, patch, sudo, zip
 # Changes:   clang 3.5 → clang-4.0
 #
 # Go is described as a requirement, but Bazel pulls in a Go toolchain on its
 # own so you can do without it. Similarly jq is not required to build, but is
 # very helpful for munging output data from the tools.
-RUN apt-get install --no-install-recommends -y \
-        asciidoc asciidoctor bison cmake flex git golang graphviz \
+RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
+	--no-install-recommends -y tzdata arcanist && \
+    apt-get install --no-install-recommends -y \
+        asciidoc asciidoctor bison cmake flex git golang golint graphviz \
         clang-4.0 gcc jq libssl-dev libncurses-dev libcurl4-openssl-dev \
 	make parallel patch source-highlight sudo wget uuid-dev zip && \
     apt-get autoremove  # reduce the image mass a bit
