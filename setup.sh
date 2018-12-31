@@ -55,7 +55,7 @@ then
     echo "-- Creating LLVM volume $llvolume ..." 1>&2
     docker volume create "$llvolume"
 else
-    echo " >> Volume $llvolume already exists [OK]" 1>&2
+    echo "-- Volume $llvolume already exists [OK]" 1>&2
 fi
 
 if [[ "$(docker volume ls --format={{.Name}} --filter=name=$volume)" = "" ]]
