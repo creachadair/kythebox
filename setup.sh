@@ -11,10 +11,14 @@
 #   - Creates a volume to serve as the running user's home directory and
 #     populates it with a fresh checkout of Kythe from GitHub.
 #
+#   - Creates a separate volume to hold the LLVM installation. This reduces the
+#     frequency with which you need to rebuild LLVM, which takes forever.
+#
 #   - Builds and tags an image that contains all the build tools and external
 #     dependencies needed to build Kythe with Bazel.
 #
-#   - (Re)starts a container and verifies that modules are up to date.
+#   - (Re)starts a container and verifies that modules are up to date, which
+#     has the effect of populating the LLVM volume.
 #
 
 set -e -o pipefail
@@ -37,17 +41,26 @@ readonly mountpoint=/home/kythedev
 readonly llmount="$mountpoint"/kythe/third_party/llvm
 
 # The tag to apply to the build image.
-readonly tag=kythedev
+readonly imagetag=kythedev
 
 # The name of the container created to update modules.
 readonly container=kythe-dev
 
 # -- end configuration --
 
-# Create a volume and check out Kythe into it.
+# Create and set up the volumes, if necessary. Do the LLVM volume first so we
+# can mount it into the init container to get the permissions set up.
+if [[ "$(docker volume ls --format={{.Name}} --filter=name=$llvolume)" = "" ]]
+then
+    echo "-- Creating LLVM volume $llvolume ..." 1>&2
+    docker volume create "$llvolume"
+else
+    echo " >> Volume $llvolume already exists [OK]" 1>&2
+fi
+
 if [[ "$(docker volume ls --format={{.Name}} --filter=name=$volume)" = "" ]]
 then
-    echo "-- Creating and populating $volume ..." 1>&2
+    echo "-- Creating and populating home volume $volume ..." 1>&2
     tmp="$(mktemp -d)"
     trap "rm -rf -- '$tmp'" EXIT
     kvi=kythe-volume-init
@@ -57,7 +70,6 @@ then
 
     echo " >> Installing repo into volume $volume ..." 1>&2
     docker volume create "$volume"
-    docker volume create "$llvolume"
     docker run -d --name=$kvi -it \
 	   --mount source="$volume",target="$mountpoint" \
 	   --mount source="$llvolume",target="$llmount" \
@@ -73,10 +85,10 @@ fi
 
 # Build the image with all the tools Kythe needs.
 echo "
--- Building and tagging image: $tag ..." 1>&2
+-- Building and tagging image: $imagetag ..." 1>&2
 readonly dir="$(dirname "$0")"
 (cd "$dir" ; \
- docker build -t "$tag" \
+ docker build -t "$imagetag" \
 	--build-arg HOMEDIR="$mountpoint" \
 	--build-arg LLVMDIR="$llmount" \
 	image)
@@ -86,7 +98,7 @@ if [[ "$(docker ps --filter=name="$container" -a -q)" = '' ]] ; then
     docker run -d --name="$container" -it \
 	   --mount source="$volume",target="$mountpoint" \
 	   --mount source="$llvolume",target="$llmount" \
-	   "$tag":latest /bin/bash
+	   "$imagetag":latest /bin/bash
 else
     docker restart "$container"
 fi
@@ -97,4 +109,4 @@ docker exec "$container" ./tools/modules/update.sh
 echo "
 -- Container $container is ready to use.
 
-$ docker attach kythe-dev" 1>&2
+$ docker attach $container" 1>&2
