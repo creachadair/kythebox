@@ -32,12 +32,15 @@ FROM bazel AS build
 # Install the external dependencies of Kythe.
 # See: https://kythe.io/getting-started/
 #
-# Additions: cmake, make, patch, sudo, zip
-# Changes:   clang-4.0
+# Additions: cmake, golang, jq, make, patch, sudo, zip
+# Changes:   clang 3.5 → clang-4.0
 #
+# Go is described as a requirement, but Bazel pulls in a Go toolchain on its
+# own so you can do without it. Similarly jq is not required to build, but is
+# very helpful for munging output data from the tools.
 RUN apt-get install --no-install-recommends -y \
-        asciidoc asciidoctor bison cmake flex git graphviz \
-        clang-4.0 gcc libssl-dev libncurses-dev libcurl4-openssl-dev \
+        asciidoc asciidoctor bison cmake flex git golang graphviz \
+        clang-4.0 gcc jq libssl-dev libncurses-dev libcurl4-openssl-dev \
 	make parallel patch source-highlight sudo wget uuid-dev zip && \
     apt-get autoremove  # reduce the image mass a bit
 
