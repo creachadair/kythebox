@@ -8,6 +8,8 @@ installation of the [Kythe](https://kythe.io/) project in a docker container.
 ```shell
 $ git clone https://github.com/creachadair/kythebox.git
 $ ./kythebox/setup.sh
+# ... a long time passes ...
+$ docker attach kythe-dev
 ```
 
 The `setup.sh` script:
