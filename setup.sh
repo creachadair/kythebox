@@ -56,6 +56,7 @@ then
 	   --mount source="$volume",target="$mountpoint" \
 	   busybox sh
     docker cp "$tmp/kythe" "$kvi":"$mountpoint"
+    docker exec $kvi mkdir -p "$mountpoint"/go/{src,pkg,bin}
     docker exec $kvi chown -R 501:501 "$mountpoint"
     docker stop $kvi
     docker rm $kvi

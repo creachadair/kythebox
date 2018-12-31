@@ -54,6 +54,6 @@ RUN groupadd -g 501 kythedev && \
     echo 'kythedev ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
     # allow the user to sudo to install things
 USER    kythedev:kythedev
-ENV     CLANG=/usr/bin/clang-4.0
+ENV     CLANG=/usr/bin/clang-4.0 PATH="$HOMEDIR/go/bin:${PATH}"
 VOLUME  $HOMEDIR
 WORKDIR "$HOMEDIR"/kythe
