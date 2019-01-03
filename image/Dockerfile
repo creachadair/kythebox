@@ -44,17 +44,28 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
         asciidoc asciidoctor bison cmake flex git golang golint graphviz \
         clang-4.0 gcc jq libssl-dev libncurses-dev libcurl4-openssl-dev \
 	make parallel patch source-highlight sudo wget uuid-dev zip && \
-    apt-get autoremove  # reduce the image mass a bit
+	apt-get autoremove  # reduce the image mass a bit
 
-FROM build AS kythe
-ARG HOMEDIR=/home/kythedev
-ARG LLVMDIR=/home/kythedev/kythe/third_party/llvm
+FROM build AS clean
+# Clean up random crud from the build environment before we copy out.
+# N.B. These cleanup rules are Anglocentric (in re: locale).
+RUN apt-get remove -y python3* && \
+    apt-get autoremove -y && \
+    rm -fr -- /var/lib/apt/lists/* && \
+    rm -fr -- /usr/share/icons/* && \
+    find /usr/share/locale -mindepth 1 -maxdepth 1 -type d \
+       -not -name 'en' -exec rm -fr -- {} ';'
+
+FROM scratch AS kythe
 #
 # The container is expected to map volume kythe-dev-repo to $HOMEDIR so that
 # results are persisted.
 #
 # To update the repo, attach to the container and run "git pull" normally.
 #
+ARG HOMEDIR=/home/kythedev
+ARG LLVMDIR=/home/kythedev/kythe/third_party/llvm
+COPY --from=clean / /
 RUN groupadd -g 501 kythedev && \
     useradd -r -m -u 501 -g kythedev kythedev && \
     echo 'kythedev ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
@@ -63,3 +74,4 @@ USER    kythedev:kythedev
 ENV     CLANG=/usr/bin/clang-4.0 PATH="$HOMEDIR/go/bin:${PATH}"
 VOLUME  $HOMEDIR $LLVMDIR
 WORKDIR "$HOMEDIR"/kythe
+CMD     ["/bin/bash"]

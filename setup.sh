@@ -98,7 +98,7 @@ if [[ "$(docker ps --filter=name="$container" -a -q)" = '' ]] ; then
     docker run -d --name="$container" -it \
 	   --mount source="$volume",target="$mountpoint" \
 	   --mount source="$llvolume",target="$llmount" \
-	   "$imagetag":latest /bin/bash
+	   "$imagetag":latest
 else
     docker restart "$container"
 fi
