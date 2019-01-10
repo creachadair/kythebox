@@ -43,8 +43,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
     apt-get install --no-install-recommends -y \
         asciidoc asciidoctor bison cmake flex git golang golint graphviz \
         clang-4.0 gcc jq libssl-dev libncurses-dev libcurl4-openssl-dev \
-	make parallel patch source-highlight sudo wget uuid-dev zip && \
-	apt-get autoremove  # reduce the image mass a bit
+	make parallel patch source-highlight sudo wget uuid-dev zip
 
 FROM build AS clean
 # Clean up random crud from the build environment before we copy out.
