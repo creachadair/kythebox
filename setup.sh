@@ -83,11 +83,14 @@ else
     echo "-- Volume $volume already exists [OK]" 1>&2
 fi
 
-# Build the image with all the tools Kythe needs.
+# Build the image with all the tools Kythe needs. Tag the build image
+# separately so that it will persist in the local cache; this can be safely
+# manually removed to save storage.
 echo "
 -- Building and tagging image: $imagetag ..." 1>&2
 readonly dir="$(dirname "$0")"
 (cd "$dir" ; \
+ docker build --target=build -t "$imagetag"-build image ; \
  docker build -t "$imagetag" \
 	--build-arg HOMEDIR="$mountpoint" \
 	--build-arg LLVMDIR="$llmount" \
