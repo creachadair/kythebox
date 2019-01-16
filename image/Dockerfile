@@ -67,8 +67,10 @@ ARG LLVMDIR=/home/kythedev/kythe/third_party/llvm
 COPY --from=clean / /
 RUN groupadd -g 501 kythedev && \
     useradd -r -m -u 501 -g kythedev kythedev && \
-    echo 'kythedev ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
-    # allow the user to sudo to install things
+    echo 'kythedev ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers && \
+    chmod -v 04755 /usr/bin/sudo
+    # Allow the user to sudo to install things.
+    # We have to chmod sudo because COPY doesn't preserve that bit.
 USER    kythedev:kythedev
 ENV     CLANG=/usr/bin/clang-4.0 PATH="$HOMEDIR/go/bin:${PATH}"
 VOLUME  $HOMEDIR $LLVMDIR
