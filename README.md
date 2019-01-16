@@ -14,11 +14,13 @@ $ docker attach kythe-dev
 
 The `setup.sh` script:
 
--  Creates a volume to serve as the running user's home directory and populates
-   it with a fresh checkout of Kythe from GitHub.
+-  Creates a persistent read-write volume to serve as the running user's home
+   directory and populates it with a fresh checkout of Kythe from GitHub.
+   Local changes to the working copy will be preserved here.
 
--  Creates a separate volume to hold the LLVM installation. This reduces the
-   frequency with which you need to rebuild LLVM, which takes forever.
+-  Creates a separate persistent read-write volume for the LLVM installation.
+   This reduces the frequency with which you need to rebuild LLVM, which takes
+   forever.
 
 -  Builds and tags an image that contains all the build tools and external
    dependencies needed to build Kythe with Bazel.
@@ -36,7 +38,8 @@ can use `sudo` to become root for installation purposes.
 
 Note, however, that any changes you make outside `$HOME` will disappear when
 the image is removed -- if you want a more expressive toolchain you'll need to
-edit the [Dockerfile](image/Dockerfile).
+edit the [Dockerfile](image/Dockerfile) or use `docker commit` to update your
+tag of the image.
 
 ## Maintenance
 
