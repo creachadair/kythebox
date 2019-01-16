@@ -36,10 +36,17 @@ After the script runs there will be a container named `kythe-dev` that you can
 attach to and run builds. You enter the container as an unprivileged user but
 can use `sudo` to become root for installation purposes.
 
-Note, however, that any changes you make outside `$HOME` will disappear when
-the image is removed -- if you want a more expressive toolchain you'll need to
-edit the [Dockerfile](image/Dockerfile) or use `docker commit` to update your
-tag of the image.
+Note that any changes you make outside `$HOME` will disappear when the image is
+removed. If you want a more expressive toolchain you'll need to install it
+manually and update the tag, e.g.
+
+```shell
+host $ docker attach kythe-dev
+cont % sudo apt-get update ; sudo apt-get install -y tmux
+host $ docker commit kythe-dev kythedev:latest
+```
+
+or, just edit the [Dockerfile](image/Dockerfile).
 
 ## Maintenance
 
