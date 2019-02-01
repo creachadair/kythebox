@@ -18,15 +18,15 @@ The `setup.sh` script:
    directory and populates it with a fresh checkout of Kythe from GitHub.
    Local changes to the working copy will be preserved here.
 
--  Creates a separate persistent read-write volume for the LLVM installation.
-   This reduces the frequency with which you need to rebuild LLVM, which takes
-   forever.
+-  Creates a separate persistent read-write volume to cache build outputs.
+   This speeds up rebuilds, particularly for expensive toolchains like LLVM.
+   This volume can safely be purged at any time. A Bazel configuration is set
+   up to point to this volume as a `--disk_cache`.
 
 -  Builds and tags an image that contains all the build tools and external
    dependencies needed to build Kythe with Bazel.
 
--  (Re)starts a container and verifies that modules are up to date, which has
-   the effect of populating the LLVM volume.
+-  (Re)starts a container on the image.
 
 The script takes no arguments, and it should not be necessary to edit anything,
 but there are some configuration variables at the top which you can modify if
@@ -59,10 +59,9 @@ or, just edit the [Dockerfile](image/Dockerfile).
     ./kythebox/setup.sh
     ```
 
-    You can do this _without_ modifying the image or rebuilding LLVM.  If your
-	LLVM volume is pooched and needs replacement, you can do the same for
-	`kythe-dev-llvm`.  In that case you _will_ have to wait for LLFM to
-	rebuild, however.
+    You can do this _without_ modifying the image.  If your cache volume is
+	pooched and needs replacement, you can do the same for `kythe-dev-cache`.
+
 
  -  If you need to add items to the image, edit the
 	[Dockerfile](image/Dockerfile) and rerun `setup.sh` to rebuild the image:
@@ -71,5 +70,3 @@ or, just edit the [Dockerfile](image/Dockerfile).
     docker stop kythe-dev ; docker rm kythe-dev
     ./kythebox/setup.sh
     ```
-
-    This will not make you rebuild LLVM.  Thank heaven for small favours.
