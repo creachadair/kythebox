@@ -63,7 +63,7 @@ FROM scratch AS kythe
 # To update the repo, attach to the container and run "git pull" normally.
 #
 ARG HOMEDIR=/home/kythedev
-ARG LLVMDIR=/home/kythedev/kythe/third_party/llvm
+ARG CACHEDIR=/home/kythedev/buildcache
 COPY --from=clean / /
 RUN groupadd -g 501 kythedev && \
     useradd -r -m -u 501 -g kythedev kythedev && \
@@ -73,6 +73,6 @@ RUN groupadd -g 501 kythedev && \
     # We have to chmod sudo because COPY doesn't preserve that bit.
 USER    kythedev:kythedev
 ENV     CLANG=/usr/bin/clang-4.0 PATH="$HOMEDIR/go/bin:${PATH}"
-VOLUME  $HOMEDIR $LLVMDIR
+VOLUME  $HOMEDIR $CACHEDIR
 WORKDIR "$HOMEDIR"/kythe
 CMD     ["/bin/bash"]
