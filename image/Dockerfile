@@ -32,18 +32,22 @@ FROM bazel AS build
 # Install the external dependencies of Kythe.
 # See: https://kythe.io/getting-started/
 #
-# Additions: arcanist, cmake, golang, golint, jq, make, patch, sudo, zip
+# Additions: arcanist, cmake, golint, jq, make, patch, sudo, zip
 # Changes:   clang 3.5 → clang-4.0
 #
 # Go is described as a requirement, but Bazel pulls in a Go toolchain on its
 # own so you can do without it. Similarly jq is not required to build, but is
 # very helpful for munging output data from the tools.
+#
+ARG GO_VERSION=1.11.5
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
 	--no-install-recommends -y tzdata arcanist && \
     apt-get install --no-install-recommends -y \
-        asciidoc asciidoctor bison cmake flex git golang golint graphviz \
+        asciidoc asciidoctor bison cmake flex git golint graphviz \
         clang-4.0 gcc jq libssl-dev libncurses-dev libcurl4-openssl-dev \
 	make parallel patch source-highlight sudo wget uuid-dev zip
+RUN ( cd /usr/local && \
+	curl -sL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz | tar -xzf - )
 
 FROM build AS clean
 # Clean up random crud from the build environment before we copy out.
@@ -72,7 +76,7 @@ RUN groupadd -g 501 kythedev && \
     # Allow the user to sudo to install things.
     # We have to chmod sudo because COPY doesn't preserve that bit.
 USER    kythedev:kythedev
-ENV     CLANG=/usr/bin/clang-4.0 PATH="$HOMEDIR/go/bin:${PATH}"
+ENV     CLANG=/usr/bin/clang-4.0 PATH="$HOMEDIR/go/bin:/usr/local/go/bin:${PATH}"
 VOLUME  $HOMEDIR $CACHEDIR
 WORKDIR "$HOMEDIR"/kythe
 CMD     ["/bin/bash"]
