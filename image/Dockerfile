@@ -76,7 +76,7 @@ RUN groupadd -g 501 kythedev && \
     # Allow the user to sudo to install things.
     # We have to chmod sudo because COPY doesn't preserve that bit.
 USER    kythedev:kythedev
-ENV     CLANG=/usr/bin/clang-4.0 PATH="$HOMEDIR/go/bin:/usr/local/go/bin:${PATH}"
+ENV     CC=/usr/bin/clang-4.0 PATH="$HOMEDIR/go/bin:/usr/local/go/bin:${PATH}"
 VOLUME  $HOMEDIR $CACHEDIR
 WORKDIR "$HOMEDIR"/kythe
 CMD     ["/bin/bash"]
