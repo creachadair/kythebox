@@ -30,6 +30,8 @@ readonly volume=kythe-dev-homedir
 readonly cache=kythe-dev-cache
 
 # The URL of the Kythe repository, for "git clone".
+# If you want to test unmerged changes, you may want to replace this with the
+# URL of your own fork.
 readonly repo='https://github.com/kythe/kythe.git'
 
 # The path where the home volume should be mounted.
