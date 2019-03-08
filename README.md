@@ -8,32 +8,31 @@ installation of the [Kythe](https://kythe.io/) project in a docker container.
 ```shell
 $ git clone https://github.com/creachadair/kythebox.git
 $ ./kythebox/setup.sh
-# ... a long time passes ...
+$ docker pull creachadair/kythebox  # or ./kythebox/build.sh
+# ... time passes ...
+$ ./kythebox/start.sh
 $ docker attach kythe-dev
 ```
 
-The `setup.sh` script:
+The `setup.sh` script creates a persistent read-write volume to serve as the
+user's home directory, and populates it with a fresh checkout of Kythe from
+GitHub at HEAD on the `master` branch. Local changes to the working copy will
+be preserved here.
 
--  Creates a persistent read-write volume to serve as the running user's home
-   directory and populates it with a fresh checkout of Kythe from GitHub.
-   Local changes to the working copy will be preserved here.
+It also creates a separate persistent read-write volume to cache build outputs.
+This speeds up rebuilds, particularly for expensive toolchains like LLVM.  This
+volume can safely be purged at any time. A Bazel configuration is set up to
+point to this volume as a `--disk_cache`.
 
--  Creates a separate persistent read-write volume to cache build outputs.
-   This speeds up rebuilds, particularly for expensive toolchains like LLVM.
-   This volume can safely be purged at any time. A Bazel configuration is set
-   up to point to this volume as a `--disk_cache`.
+The `build.sh` script is used to build the container image from scratch.  The
+resulting image is unfortunately quite large, so it is not obvious whether you
+are better off using `docker pull` or building it yourself. Nevertheless, I
+will try to keep a reasonably up-to-date tag of `creachadair/kythedev` on
+dockerhub.
 
--  Builds and tags an image that contains all the build tools and external
-   dependencies needed to build Kythe with Bazel.
-
--  (Re)starts a container on the image.
-
-The script takes no arguments, and it should not be necessary to edit anything,
-but there are some configuration variables at the top which you can modify if
-you wish.
-
-After the script runs there will be a container named `kythe-dev` that you can
-attach to and run builds. You enter the container as an unprivileged user but
+The `start.sh` script simply starts or restarts a container named `kythe-dev`
+using the image described above. After this script runs you can attach to the
+container and run builds. You enter the container as an unprivileged user but
 can use `sudo` to become root for installation purposes.
 
 Note that any changes you make outside `$HOME` will disappear when the image is
@@ -43,7 +42,7 @@ manually and update the tag, e.g.
 ```shell
 host $ docker attach kythe-dev
 cont % sudo apt-get update ; sudo apt-get install -y tmux
-host $ docker commit kythe-dev kythedev:latest
+host $ docker commit kythe-dev creachadair/kythedev:latest
 ```
 
 or, just edit the [Dockerfile](image/Dockerfile).
@@ -59,14 +58,14 @@ or, just edit the [Dockerfile](image/Dockerfile).
     ./kythebox/setup.sh
     ```
 
-    You can do this _without_ modifying the image.  If your cache volume is
+    You can do this _without_ modifying the image.  If you build cache is
 	pooched and needs replacement, you can do the same for `kythe-dev-cache`.
 
 
  -  If you need to add items to the image, edit the
-	[Dockerfile](image/Dockerfile) and rerun `setup.sh` to rebuild the image:
+	[Dockerfile](image/Dockerfile) and rerun `build.sh` to rebuild the image:
 
     ```shell
     docker stop kythe-dev ; docker rm kythe-dev
-    ./kythebox/setup.sh
+    ./kythebox/build.sh
     ```
