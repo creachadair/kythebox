@@ -39,7 +39,7 @@ FROM bazel AS build
 # own so you can do without it. Similarly jq is not required to build, but is
 # very helpful for munging output data from the tools.
 #
-ARG GO_VERSION=1.12
+ARG GO_VERSION=1.12.4
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
 	--no-install-recommends -y tzdata arcanist && \
     apt-get install --no-install-recommends -y \
