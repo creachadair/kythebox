@@ -69,10 +69,7 @@ RUN apt-get remove -y python3* && \
        -not -name 'en' -exec rm -fr -- {} ';' && \
     groupadd -g 501 kythedev && \
     useradd -r -m -u 501 -g kythedev kythedev && \
-    echo 'kythedev ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers && \
-    chmod -v 04755 /usr/bin/sudo
-    # Allow the user to sudo to install things.
-    # We have to chmod sudo because COPY doesn't preserve that bit.
+    echo 'kythedev ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
 FROM scratch AS kythe
 #
@@ -84,6 +81,9 @@ FROM scratch AS kythe
 ARG HOMEDIR=/home/kythedev
 ARG CACHEDIR=/home/kythedev/buildcache
 COPY --from=clean / /
+RUN  chmod -v 04755 /usr/bin/sudo
+    # Allow the user to sudo to install things.
+    # We have to chmod sudo because COPY doesn't preserve that bit.
 USER    kythedev:kythedev
 ENV     CC=/usr/bin/clang-4.0 PATH="$HOMEDIR/go/bin:/usr/local/go/bin:${PATH}"
 VOLUME  $HOMEDIR $CACHEDIR
