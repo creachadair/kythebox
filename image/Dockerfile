@@ -33,7 +33,7 @@ FROM bazel AS build
 # See: https://kythe.io/getting-started/
 #
 # Additions: arcanist, cmake, golint, jq, make, patch, sudo, zip
-# Changes:   clang 3.5 → clang-4.0
+# Changes:   clang 3.8 → clang-4.0
 #
 # Go is described as a requirement, but Bazel pulls in a Go toolchain on its
 # own so you can do without it. Similarly jq is not required to build, but is
@@ -43,9 +43,9 @@ ARG GO_VERSION=1.12.4
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
 	--no-install-recommends -y tzdata arcanist && \
     apt-get install --no-install-recommends -y \
-        asciidoc asciidoctor bison cmake flex git golint graphviz \
-        clang-4.0 gcc jq libssl-dev libncurses-dev libcurl4-openssl-dev \
-	make parallel patch source-highlight sudo wget uuid-dev zip
+        asciidoc asciidoctor bison flex git golint graphviz \
+	clang-4.0 gcc jq libncurses-dev make parallel patch \
+	source-highlight sudo wget uuid-dev zip
 RUN ( cd /usr/local && \
 	curl -sL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz | tar -xzf - )
 
