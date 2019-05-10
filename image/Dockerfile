@@ -28,7 +28,7 @@ FROM base AS bazel
 # So here we pin a specific release, which will occasionally need to be updated
 # as Kythe updates its requirements (see the WORKSPACE file).
 #
-ARG BAZEL_VERSION=0.24.1
+ARG BAZEL_VERSION=0.25.1
 RUN apt-get update && \
     apt-get install --no-install-recommends -qy curl ca-certificates
 RUN curl -L -o /tmp/bazel.deb \
