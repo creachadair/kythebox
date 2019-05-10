@@ -28,27 +28,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
 RUN ( cd /usr/local && \
 	curl -sL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz | tar -xzf - )
 
-# If you want man pages and other niceties in your image, uncomment this.
-# Be aware, however, that this will make the image much larger.
-#
-#RUN apt-get update && \
-#    yes | unminimize && \
-#    apt-get install --no-install-recommends -y man-db
-
-FROM build AS clean
-# Clean up random crud from the build environment before we copy out.
-# N.B. These cleanup rules are Anglocentric (in re: locale).
-RUN apt-get remove -y python3* && \
-    apt-get autoremove -y && \
-    rm -fr -- /var/lib/apt/lists/* && \
-    rm -fr -- /usr/share/icons/* && \
-    find /usr/share/locale -mindepth 1 -maxdepth 1 -type d \
-       -not -name 'en' -exec rm -fr -- {} ';' && \
-    groupadd -g 501 kythedev && \
-    useradd -r -m -u 501 -g kythedev kythedev && \
-    echo 'kythedev ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
-
-FROM scratch AS kythe
+FROM build AS kythe
 #
 # The container is expected to map volume kythe-dev-repo to $HOMEDIR so that
 # results are persisted.
@@ -57,10 +37,19 @@ FROM scratch AS kythe
 #
 ARG HOMEDIR=/home/kythedev
 ARG CACHEDIR=/home/kythedev/buildcache
-COPY --from=clean / /
-RUN  chmod -v 04755 /usr/bin/sudo
-    # Allow the user to sudo to install things.
-    # We have to chmod sudo because COPY doesn't preserve that bit.
+
+# Set up an unprivileged user to run builds.
+RUN groupadd -g 501 kythedev && \
+    useradd -r -m -u 501 -g kythedev kythedev && \
+    echo 'kythedev ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+# If you want man pages and other niceties in your image, uncomment this.
+# Be aware, however, that this will make the image much larger.
+#
+#RUN apt-get update && \
+#    yes | unminimize && \
+#    apt-get install --no-install-recommends -y man-db
+
 USER    kythedev:kythedev
 ENV     CC=/usr/bin/clang-4.0 PATH="$HOMEDIR/go/bin:/usr/local/go/bin:${PATH}"
 VOLUME  $HOMEDIR $CACHEDIR
