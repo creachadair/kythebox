@@ -32,6 +32,7 @@ echo "
 -- Building and tagging image: $imagetag ..." 1>&2
 readonly dir="$(dirname "$0")"
 (cd "$dir" ; \
+ docker build -t "$buildtag" image/bazelbox && \
  docker build -t "$imagetag" \
 	--build-arg HOMEDIR="$mountpoint" \
 	--build-arg CACHEDIR="$cachemount" \

@@ -20,7 +20,8 @@ readonly mountpoint=/home/kythedev
 # The path where the cache volume should be mounted.
 readonly cachemount="$mountpoint"/buildcache
 
-# The tag to apply to the build image.
+# The tags to apply to the build images.
+readonly buildtag=creachadair/bazelbox
 readonly imagetag=creachadair/kythedev
 
 # The name of the container to create or restart.
