@@ -1,42 +1,12 @@
 #
 # Name:    Dockerfile
 # Purpose: Build a developer image of Kythe.
-# Author:  M. J. Fromberger <michael@sourced.tech>
+# Author:  M. J. Fromberger <michael.j.fromberger@gmail.com>
 #
 # See also: https://kythe.io/
 #
 
-FROM ubuntu:latest AS base
-#
-# If you want man pages and other niceties in your image, uncomment this.
-# Be aware, however, that this will make the image much larger.
-#
-#RUN apt-get update && \
-#    yes | unminimize && \
-#    apt-get install --no-install-recommends -y man-db
-
-FROM base AS bazel
-#
-# Install bazel from the bazel GitHub releases page.
-#
-# Ideally we would just take the latest release version of Bazel.
-# Unfortunately, releases often ship breaking changes.  Kythe uses quite a lot
-# of custom rules and macros to shim compatibility between the internal and
-# eternal build environments, and Bazel regularly breaks language and API
-# features those rules and macros use.
-#
-# So here we pin a specific release, which will occasionally need to be updated
-# as Kythe updates its requirements (see the WORKSPACE file).
-#
-ARG BAZEL_VERSION=0.25.1
-RUN apt-get update && \
-    apt-get install --no-install-recommends -qy curl ca-certificates
-RUN curl -L -o /tmp/bazel.deb \
-	https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb && \
-    apt install -qy /tmp/bazel.deb && \
-    rm -f -- /tmp/bazel.deb
-
-FROM bazel AS build
+FROM creachadair/bazelbox AS build
 #
 # Install the external dependencies of Kythe.
 # See: https://kythe.io/getting-started/
@@ -57,6 +27,13 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
 	source-highlight sudo wget uuid-dev zip
 RUN ( cd /usr/local && \
 	curl -sL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz | tar -xzf - )
+
+# If you want man pages and other niceties in your image, uncomment this.
+# Be aware, however, that this will make the image much larger.
+#
+#RUN apt-get update && \
+#    yes | unminimize && \
+#    apt-get install --no-install-recommends -y man-db
 
 FROM build AS clean
 # Clean up random crud from the build environment before we copy out.

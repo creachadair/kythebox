@@ -1,0 +1,28 @@
+#
+# Name:    Dockerfile
+# Purpose: Build a base Ubuntu image with Bazel installed.
+# Author:  M. J. Fromberger <michael.j.fromberger@gmail.com>
+#
+# See also: https://bazel.build/
+#
+
+FROM ubuntu:latest AS bazel
+#
+# Install bazel from the bazel GitHub releases page.
+#
+# Ideally we would just take the latest release version of Bazel.
+# Unfortunately, releases often ship breaking changes.  Kythe uses quite a lot
+# of custom rules and macros to shim compatibility between the internal and
+# eternal build environments, and Bazel regularly breaks language and API
+# features those rules and macros use.
+#
+# So here we pin a specific release, which will occasionally need to be updated
+# as Kythe updates its requirements (see the WORKSPACE file).
+#
+ARG BAZEL_VERSION=0.25.1
+RUN apt-get update && \
+    apt-get install --no-install-recommends -qy curl ca-certificates
+RUN curl -L -o /tmp/bazel.deb \
+	https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb && \
+    apt install -qy /tmp/bazel.deb && \
+    rm -f -- /tmp/bazel.deb
