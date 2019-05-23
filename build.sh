@@ -23,7 +23,7 @@ then
 fi
 if ! volume_exists "$volume"
 then
-    echo "Home volume not found: PLease run 'setup.sh' first." 2>&1
+    echo "Home volume not found: Please run 'setup.sh' first." 2>&1
     exit 1
 fi
 
