@@ -20,9 +20,9 @@ FROM ubuntu:latest AS bazel
 # as Kythe updates its requirements (see the WORKSPACE file).
 #
 ARG BAZEL_VERSION=0.25.3
-RUN apt-get update && \
-    apt-get install --no-install-recommends -qy curl ca-certificates
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends --no-install-suggests -qq -y curl ca-certificates
 RUN curl -L -o /tmp/bazel.deb \
 	https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb && \
-    apt install -qy /tmp/bazel.deb && \
+    apt install -qq -y /tmp/bazel.deb && \
     rm -f -- /tmp/bazel.deb

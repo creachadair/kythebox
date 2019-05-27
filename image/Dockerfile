@@ -20,8 +20,9 @@ FROM creachadair/bazelbox AS build
 #
 ARG GO_VERSION=1.12.5
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
-	--no-install-recommends -y tzdata arcanist && \
-    apt-get install --no-install-recommends -y \
+	--no-install-recommends --no-install-suggests -qq -y \
+	tzdata arcanist && \
+    apt-get install --no-install-recommends --no-install-suggests -qq -y \
         asciidoc asciidoctor bison flex git golint graphviz \
 	clang-4.0 gcc jq libncurses-dev make parallel patch \
 	source-highlight sudo wget uuid-dev zip
