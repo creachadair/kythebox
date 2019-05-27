@@ -18,7 +18,6 @@ FROM creachadair/bazelbox AS build
 # own so you can do without it. Similarly jq is not required to build, but is
 # very helpful for munging output data from the tools.
 #
-ARG GO_VERSION=1.12.5
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
 	--no-install-recommends --no-install-suggests -qq -y \
 	tzdata arcanist && \
@@ -26,8 +25,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
         asciidoc asciidoctor bison flex git golint graphviz \
 	clang-4.0 gcc jq libncurses-dev make parallel patch \
 	source-highlight sudo wget uuid-dev zip
-RUN ( cd /usr/local && \
-	curl -sL https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz | tar -xzf - )
+COPY --from=golang:1.12 /usr/local/go /usr/local/go
 
 FROM build AS kythe
 #
