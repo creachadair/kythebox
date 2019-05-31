@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Name:    start.sh
+# Usage    start.sh [attach]
 # Purpose: Run a Kythe developer container from a prebuilt image.
 #
 # Copyright (C) 2019 Michael J. Fromberger. All Rights Reserved.
@@ -21,7 +21,11 @@ else
     docker restart "$container"
 fi
 
-echo "
--- Container $container is ready to use.
+if [[ "$1" = "attach" ]] ; then
+    docker attach "$container"
+else
+    echo "
+-- Container $container is ready to use. Run:
 
 $ docker attach $container" 1>&2
+fi
