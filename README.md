@@ -8,10 +8,7 @@ installation of the [Kythe](https://kythe.io/) project in a docker container.
 ```shell
 $ git clone https://github.com/creachadair/kythebox.git
 $ ./kythebox/setup.sh
-$ docker pull creachadair/kythebox  # or ./kythebox/build.sh
-# ... time passes ...
-$ ./kythebox/start.sh
-$ docker attach kythe-dev
+$ ./kythebox/start.sh attach
 ```
 
 The `setup.sh` script creates a persistent read-write volume to serve as the
@@ -32,8 +29,9 @@ dockerhub.
 
 The `start.sh` script simply starts or restarts a container named `kythe-dev`
 using the image described above. After this script runs you can attach to the
-container and run builds. You enter the container as an unprivileged user but
-can use `sudo` to become root for installation purposes.
+container (it will do this for you, if you add `attach`) and run builds. You
+begin as an unprivileged user in the container but you can use `sudo` to become
+root for installation purposes.
 
 Note that any changes you make outside `$HOME` will disappear when the image is
 removed. If you want a more expressive toolchain you'll need to install it
