@@ -24,7 +24,7 @@ point to this volume as a `--disk_cache`.
 The `build.sh` script is used to build the container image from scratch.  The
 resulting image is unfortunately quite large, so it is not obvious whether you
 are better off using `docker pull` or building it yourself. Nevertheless, I
-will try to keep a reasonably up-to-date tag of `creachadair/kythedev` on
+will try to keep a reasonably up-to-date tag of `creachadair/kythebox` on
 dockerhub.
 
 The `start.sh` script simply starts or restarts a container named `kythe-dev`
@@ -40,7 +40,7 @@ manually and update the tag, e.g.
 ```shell
 host $ docker attach kythe-dev
 cont % sudo apt-get update ; sudo apt-get install -y tmux
-host $ docker commit kythe-dev creachadair/kythedev:latest
+host $ docker commit kythe-dev creachadair/kythebox:latest
 ```
 
 or, just edit the [Dockerfile](image/Dockerfile).

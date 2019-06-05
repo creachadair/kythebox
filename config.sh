@@ -22,7 +22,7 @@ readonly cachemount="$mountpoint"/buildcache
 
 # The tags to apply to the build images.
 readonly buildtag=creachadair/bazelbox
-readonly imagetag=creachadair/kythedev
+readonly imagetag=creachadair/kythebox
 
 # The name of the container to create or restart.
 readonly container=kythe-dev

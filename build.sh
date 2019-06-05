@@ -36,4 +36,4 @@ readonly dir="$(dirname "$0")"
  docker build -t "$imagetag" \
 	--build-arg HOMEDIR="$mountpoint" \
 	--build-arg CACHEDIR="$cachemount" \
-	-f image/Dockerfile.kythedev image)
+	-f image/Dockerfile.kythebox image)
