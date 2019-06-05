@@ -11,6 +11,7 @@
 set -e -o pipefail
 
 . "$(dirname $0)/config.sh"
+volumes_must_exist "$cache" "$volume"
 
 if [[ "$(docker ps --filter=name="$container" -a -q)" = '' ]] ; then
     docker run -d --name="$container" -it \

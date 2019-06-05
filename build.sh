@@ -13,19 +13,7 @@
 set -e -o pipefail
 
 . "$(dirname $0)/config.sh"
-
-# Create and set up the volumes, if necessary. Do the cache volume first so we
-# can mount it into the init container to get the permissions set up.
-if ! volume_exists "$cache"
-then
-    echo "Cache volume not found: Please run 'setup.sh' first." 2>&1
-    exit 1
-fi
-if ! volume_exists "$volume"
-then
-    echo "Home volume not found: Please run 'setup.sh' first." 2>&1
-    exit 1
-fi
+volumes_must_exist "$cache" "$volume"
 
 # Build the image with all the tools Kythe needs.
 echo "

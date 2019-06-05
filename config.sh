@@ -32,3 +32,12 @@ readonly container=kythe-dev
 volume_exists() {
     [[ "$(docker volume ls --format={{.Name}} --filter=name=${1:?missing volume})" != "" ]]
 }
+
+volumes_must_exist() {
+    for vol in "$@" ; do
+	if ! volume_exists "$vol"; then
+	    echo "Volume $vol not found: Please run 'setup.sh' first." 2>&1
+	    exit 1
+	fi
+    done
+}
