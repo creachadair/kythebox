@@ -9,19 +9,33 @@
 # this script builds and tags an image that contains all the build tools and
 # external dependencies needed to build Kythe with Bazel.
 #
-
 set -e -o pipefail
 
-. "$(dirname $0)/config.sh"
+cd "$(dirname $0)"
+. config.sh
 volumes_must_exist "$cache" "$volume"
 
-# Build the image with all the tools Kythe needs.
-echo "
--- Building and tagging image: $imagetag ..." 1>&2
-readonly dir="$(dirname "$0")"
-(cd "$dir" ; \
- docker build -t "$buildtag" -f image/Dockerfile.bazelbox image && \
- docker build -t "$imagetag" \
-	--build-arg HOMEDIR="$mountpoint" \
-	--build-arg CACHEDIR="$cachemount" \
-	-f image/Dockerfile.kythebox image)
+build_image() {
+    local tag="${1:?missing tag}"
+    local sfx="$(echo $tag | cut -d/ -f2)"
+    docker build -t "$tag" -f image/Dockerfile."$sfx" image
+}
+
+case "$1" in
+    ("")
+	image_exists "$buildtag" || build_image "$buildtag"
+	image_exists "$imagetag" || build_image "$imagetag"
+	;;
+    (all)
+	build_image "$buildtag"
+	build_image "$imagetag"
+	;;
+    (push)
+	docker push "$buildtag"
+	docker push "$imagetag"
+	;;
+    (*)
+	echo "Unknown build command '$1'" 1>&2
+	exit 1
+	;;
+esac
