@@ -33,6 +33,10 @@ volume_exists() {
     [[ "$(docker volume ls --format={{.Name}} --filter=name=${1:?missing volume})" != "" ]]
 }
 
+image_exists() {
+    [[ "$(docker image ls --format={{.Repository}} --filter=reference=${1:?missing image})" != "" ]]
+}
+
 volumes_must_exist() {
     for vol in "$@" ; do
 	if ! volume_exists "$vol"; then
