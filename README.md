@@ -39,11 +39,11 @@ manually and update the tag, e.g.
 
 ```shell
 host $ docker attach kythe-dev
-cont % sudo apt-get update ; sudo apt-get install -y tmux
+ctnr % sudo apt-get update ; sudo apt-get install -y tmux
 host $ docker commit kythe-dev creachadair/kythebox:latest
 ```
 
-or, just edit the [Dockerfile](image/Dockerfile).
+or, just edit the [Dockerfile](image/Dockerfile.kythebox).
 
 ## Maintenance
 
