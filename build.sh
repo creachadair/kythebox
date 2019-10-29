@@ -13,7 +13,6 @@ set -e -o pipefail
 
 cd "$(dirname $0)"
 . config.sh
-volumes_must_exist "$cache" "$volume"
 
 build_image() {
     local tag="${1:?missing tag}"
