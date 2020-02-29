@@ -19,7 +19,7 @@ FROM ubuntu:latest AS bazel
 # So here we pin a specific release, which will occasionally need to be updated
 # as Kythe updates its requirements (see the WORKSPACE file).
 #
-ARG BAZEL_VERSION=2.0.0
+ARG BAZEL_VERSION=2.1.1
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends --no-install-suggests -qq -y curl ca-certificates
 RUN curl -L -o /tmp/bazel.deb \
