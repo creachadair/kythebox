@@ -11,8 +11,7 @@ FROM creachadair/bazelbox AS build
 # Install the external dependencies of Kythe.
 # See: https://kythe.io/getting-started/
 #
-# Additions: arcanist, cmake, golint, jq, make, patch, sudo, zip
-# Changes:   clang 3.8 → clang-8
+# Additions: arcanist, cmake, golint, jq, make, patch, python, sudo, zip
 #
 # Go is described as a requirement, but Bazel pulls in a Go toolchain on its
 # own so you can do without it. Similarly jq is not required to build, but is
@@ -24,7 +23,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
     apt-get install --no-install-recommends --no-install-suggests -qq -y \
         asciidoc asciidoctor bison flex git golint graphviz \
 	clang-8 gcc jq libncurses-dev make openjdk-8-jdk parallel patch \
-	source-highlight sudo wget uuid-dev zip
+	python source-highlight sudo wget uuid-dev zip
 COPY --from=golang:1.14 /usr/local/go /usr/local/go
 
 FROM build AS kythe
