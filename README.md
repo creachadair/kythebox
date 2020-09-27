@@ -56,12 +56,12 @@ or, just edit the [Dockerfile](image/Dockerfile.kythebox).
     ./kythebox/setup.sh
     ```
 
-    You can do this _without_ modifying the image.  If you build cache is
-	pooched and needs replacement, you can do the same for `kythe-dev-cache`.
+    You can do this _without_ modifying the image.  If your build cache is
+    pooched and needs replacement, you can do the same for `kythe-dev-cache`.
 
 
  -  If you need to add items to the image, edit the
-	[Dockerfile](image/Dockerfile) and rerun `build.sh` to rebuild the image:
+    [Dockerfile](image/Dockerfile) and rerun `build.sh` to rebuild the image:
 
     ```shell
     docker stop kythe-dev ; docker rm kythe-dev
