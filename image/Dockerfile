@@ -37,10 +37,12 @@ RUN apt-get update -qq && \
 	tzdata arcanist  asciidoc asciidoctor bison flex git golint graphviz \
 	clang-8 gcc g++ jq libncurses-dev make openjdk-8-jdk parallel patch \
 	python source-highlight sudo wget unzip uuid-dev zip
+
+FROM build AS setup
 COPY --from=golang:1.15 /usr/local/go /usr/local/go
 COPY --from=bazel /usr/bin/bazel /usr/bin/bazel-real /usr/bin/
 
-FROM build AS kythe
+FROM setup AS kythe
 #
 # The container is expected to map volume kythe-dev-repo to $HOMEDIR so that
 # results are persisted.
