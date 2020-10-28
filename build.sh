@@ -16,21 +16,17 @@ cd "$(dirname $0)"
 
 build_image() {
     local tag="${1:?missing tag}"
-    local sfx="$(echo $tag | cut -d/ -f2)"
-    docker build -t "$tag" -f image/Dockerfile."$sfx" image
+    docker build -t "$tag" -f image/Dockerfile image
 }
 
 case "$1" in
     ("")
-	image_exists "$buildtag" || build_image "$buildtag"
 	image_exists "$imagetag" || build_image "$imagetag"
 	;;
     (all)
-	build_image "$buildtag"
 	build_image "$imagetag"
 	;;
     (push)
-	docker push "$buildtag"
 	docker push "$imagetag"
 	;;
     (*)

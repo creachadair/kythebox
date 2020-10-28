@@ -6,25 +6,39 @@
 # See also: https://kythe.io/
 #
 
-FROM creachadair/bazelbox AS build
+FROM ubuntu:latest AS bazel
+#
+# Install Bazel from a release distribution.
+#
+ARG BAZEL_VERSION=3.7.0
+RUN apt-get update -qq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install \
+      --no-install-recommends --no-install-suggests -qq -y \
+      curl ca-certificates && \
+    curl -L -o /tmp/bazel.deb \
+	https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb && \
+    DEBIAN_FRONTEND=noninteractive apt install -qq -y /tmp/bazel.deb
+
+FROM ubuntu:latest AS build
 #
 # Install the external dependencies of Kythe.
 # See: https://kythe.io/getting-started/
 #
 # Additions: arcanist, cmake, golint, jq, make, patch, python, sudo, zip
+#            g++ # for Bazel
 #
 # Go is described as a requirement, but Bazel pulls in a Go toolchain on its
 # own so you can do without it. Similarly jq is not required to build, but is
 # very helpful for munging output data from the tools.
 #
-RUN env DEBIAN_FRONTEND=noninteractive apt-get install \
+RUN apt-get update -qq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install \
 	--no-install-recommends --no-install-suggests -qq -y \
-	tzdata arcanist && \
-    apt-get install --no-install-recommends --no-install-suggests -qq -y \
-        asciidoc asciidoctor bison flex git golint graphviz \
-	clang-8 gcc jq libncurses-dev make openjdk-8-jdk parallel patch \
-	python source-highlight sudo wget uuid-dev zip
+	tzdata arcanist  asciidoc asciidoctor bison flex git golint graphviz \
+	clang-8 gcc g++ jq libncurses-dev make openjdk-8-jdk parallel patch \
+	python source-highlight sudo wget unzip uuid-dev zip
 COPY --from=golang:1.15 /usr/local/go /usr/local/go
+COPY --from=bazel /usr/bin/bazel /usr/bin/bazel-real /usr/bin/
 
 FROM build AS kythe
 #
