@@ -10,7 +10,7 @@ FROM ubuntu:latest AS bazel
 #
 # Install Bazel from a release distribution.
 #
-ARG BAZEL_VERSION=3.7.0
+ARG BAZEL_VERSION=3.7.2
 RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install \
       --no-install-recommends --no-install-suggests -qq -y \
