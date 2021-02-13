@@ -43,7 +43,7 @@ ctnr % sudo apt-get update ; sudo apt-get install -y tmux
 host $ docker commit kythe-dev creachadair/kythebox:latest
 ```
 
-or, just edit the [Dockerfile](image/Dockerfile.kythebox).
+or, just edit the [Dockerfile](image/Dockerfile).
 
 ## Maintenance
 
