@@ -6,26 +6,13 @@
 # See also: https://kythe.io/
 #
 
-FROM ubuntu:latest AS bazel
-#
-# Install Bazel from a release distribution.
-#
-ARG BAZEL_VERSION=4.0.0
-RUN apt-get update -qq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install \
-      --no-install-recommends --no-install-suggests -qq -y \
-      curl ca-certificates && \
-    curl -L -o /tmp/bazel.deb \
-	https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb && \
-    DEBIAN_FRONTEND=noninteractive apt install -qq -y /tmp/bazel.deb
-
 FROM ubuntu:latest AS build
 #
 # Install the external dependencies of Kythe.
 # See: https://kythe.io/getting-started/
 #
 # Additions: arcanist, cmake, golint, jq, make, patch, python, sudo, zip
-#            g++ # for Bazel
+#            g++ # for builds in Bazel
 #
 # Go is described as a requirement, but Bazel pulls in a Go toolchain on its
 # own so you can do without it. Similarly jq is not required to build, but is
@@ -37,12 +24,9 @@ RUN apt-get update -qq && \
 	tzdata arcanist  asciidoc asciidoctor bison flex git golint graphviz \
 	clang-8 gcc g++ jq libncurses-dev make openjdk-8-jdk parallel patch \
 	python source-highlight sudo wget unzip uuid-dev zip
-
-FROM build AS setup
 COPY --from=golang:1.15 /usr/local/go /usr/local/go
-COPY --from=bazel /usr/bin/bazel /usr/bin/bazel-real /usr/bin/
 
-FROM setup AS kythe
+FROM build AS kythe
 #
 # The container is expected to map volume kythe-dev-repo to $HOMEDIR so that
 # results are persisted.
@@ -56,6 +40,11 @@ ARG CACHEDIR=/home/kythedev/buildcache
 RUN groupadd -g 501 kythedev && \
     useradd -r -m -u 501 -g kythedev kythedev && \
     echo 'kythedev ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+ENV GOBIN="/tools/go/bin"
+ENV PATH="/tools/go/bin:/usr/local/go/bin:${PATH}"
+RUN mkdir -p "$GOBIN" && \
+    go get github.com/bazelbuild/bazelisk && \
+    ln -s bazelisk "$GOBIN/bazel"
 
 # If you want man pages and other niceties in your image, uncomment this.
 # Be aware, however, that this will make the image much larger.
@@ -65,7 +54,7 @@ RUN groupadd -g 501 kythedev && \
 #    apt-get install --no-install-recommends -y man-db
 
 USER    kythedev:kythedev
-ENV     CC=/usr/bin/clang-8 PATH="$HOMEDIR/go/bin:/usr/local/go/bin:${PATH}"
+ENV     CC=/usr/bin/clang-8
 VOLUME  $HOMEDIR $CACHEDIR
 WORKDIR "$HOMEDIR"/kythe
 CMD     ["/bin/bash"]
