@@ -24,7 +24,7 @@ RUN apt-get update -qq && \
 	tzdata arcanist  asciidoc asciidoctor bison flex git golint graphviz \
 	clang-8 gcc g++ jq libncurses-dev make openjdk-8-jdk parallel patch \
 	python source-highlight sudo wget unzip uuid-dev zip
-COPY --from=golang:1.16 /usr/local/go /usr/local/go
+COPY --from=golang:1.17 /usr/local/go /usr/local/go
 
 FROM build AS kythe
 #
