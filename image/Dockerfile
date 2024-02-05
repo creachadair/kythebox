@@ -22,9 +22,9 @@ RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install \
 	--no-install-recommends --no-install-suggests -qq -y \
 	tzdata arcanist  asciidoc asciidoctor bison flex git golint graphviz \
-	clang-8 gcc g++ jq libncurses-dev make openjdk-8-jdk parallel patch \
-	python source-highlight sudo wget unzip uuid-dev zip
-COPY --from=golang:1.17 /usr/local/go /usr/local/go
+	clang gcc g++ jq libncurses-dev make openjdk-8-jdk parallel patch \
+	python3 source-highlight sudo wget unzip uuid-dev zip
+COPY --from=golang:1.21 /usr/local/go /usr/local/go
 
 FROM build AS kythe
 #
@@ -43,7 +43,7 @@ RUN groupadd -g 501 kythedev && \
 ENV GOBIN="/tools/go/bin"
 ENV PATH="/tools/go/bin:/usr/local/go/bin:${PATH}"
 RUN mkdir -p "$GOBIN" && \
-    go get github.com/bazelbuild/bazelisk && \
+    go install github.com/bazelbuild/bazelisk@latest && \
     ln -s bazelisk "$GOBIN/bazel"
 
 # If you want man pages and other niceties in your image, uncomment this.
@@ -54,7 +54,7 @@ RUN mkdir -p "$GOBIN" && \
 #    apt-get install --no-install-recommends -y man-db
 
 USER    kythedev:kythedev
-ENV     CC=/usr/bin/clang-8
+ENV     CC=/usr/bin/clang
 VOLUME  $HOMEDIR $CACHEDIR
 WORKDIR "$HOMEDIR"/kythe
 CMD     ["/bin/bash"]
